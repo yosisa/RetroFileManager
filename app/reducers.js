@@ -2,7 +2,7 @@
 
 import { combineReducers } from 'redux';
 import {
-  ITEMS_UPDATED,
+  GOTO_DIR,
   TOGGLE_DOTFILES,
   REDRAW_CURSOR,
   MOVE_CURSOR_DOWN,
@@ -35,16 +35,20 @@ function paneFactory(visibleItems) {
     };
 
     switch (action.type) {
-    case ITEMS_UPDATED:
-      let cursorHistory = Object.assign({}, state.cursorHistory);
-      cursorHistory[state.path] = state.cursor;
+    case GOTO_DIR:
+      var { cursorHistory } = state;
+      if (state.path) {
+        cursorHistory = Object.assign({}, cursorHistory, {
+          [state.path]: state.cursor
+        });
+      }
       return Object.assign({}, state, {
-        path: action.path,
-        items: action.items,
-        cursor: cursorHistory[action.path] || 0,
+        path: action.response.path,
+        items: action.response.items,
+        cursor: cursorHistory[action.response.path] || 0,
         cursorHistory,
         selection: {},
-        diskUsage: action.diskUsage
+        diskUsage: action.response.disk_usage
       });
     case TOGGLE_DOTFILES:
       let showDotFiles = !state.showDotFiles;

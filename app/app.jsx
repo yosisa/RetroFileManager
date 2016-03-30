@@ -4,11 +4,12 @@ import 'normalize.css/normalize.css';
 import 'font-awesome/css/font-awesome.css';
 import './app.css';
 
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import rpc from './middleware/rpc';
 import appReducer from './reducers';
 import { addClass, removeClass, forEachElement } from './utils';
 
-const store = createStore(appReducer);
+const store = createStore(appReducer, applyMiddleware(rpc));
 
 function scrollToCursor() {
   const row = document.querySelector('.cursor');
@@ -152,12 +153,12 @@ function stateChangedHandler(store) {
 }
 store.subscribe(stateChangedHandler(store));
 
-import { gotoDirectory } from './actions';
+import { gotoDir } from './actions';
 
 const storage = require('remote').require('./lib/storage');
 const appState = storage.get('appState');
-gotoDirectory(store, appState.leftPath || '~', '', 'left');
-gotoDirectory(store, appState.rightPath || '~', '', 'right');
+store.dispatch(gotoDir(appState.leftPath || '~', '', 'left'));
+store.dispatch(gotoDir(appState.rightPath || '~', '', 'right'));
 
 import * as keymap from './keymap';
 keymap.init(store);

@@ -1,7 +1,7 @@
 'use strict';
 
 const actions = [
-  'ITEMS_UPDATED',
+  'GOTO_DIR',
   'TOGGLE_DOTFILES',
   'REDRAW_CURSOR',
   'MOVE_CURSOR_DOWN',
@@ -23,19 +23,22 @@ for (let i = 0; i < actions.length; i++) {
   module.exports[action] = action;
 }
 
-const rpc = require('remote').require('./lib/rpc');
+import { CALL_RPC } from './middleware/rpc';
 
-export function gotoDirectory(store, dir, target, pane) {
-  rpc.readDir(dir, target).then(({path, items, disk_usage}) => {
-    let action = {
-      type: module.exports['ITEMS_UPDATED'],
-      path,
-      items,
-      diskUsage: disk_usage
-    };
-    if (pane) {
-      action.pane = pane;
+export function gotoDir(dir, target, pane) {
+  const action = {
+    type: 'GOTO_DIR',
+    [CALL_RPC]: {
+      server: '127.0.0.1:50051',
+      method: 'readDir',
+      params: {
+        base_dir: dir,
+        target: target
+      }
     }
-    store.dispatch(action);
-  });
+  };
+  if (pane) {
+    action.pane = pane;
+  }
+  return action;
 }

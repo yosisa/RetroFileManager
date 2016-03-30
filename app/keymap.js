@@ -15,7 +15,7 @@ import {
   CLOSE_PROMPT,
   SET_VISIBLE_FILTER,
   SEARCH,
-  gotoDirectory
+  gotoDir
 } from './actions';
 
 const keymap = {
@@ -29,12 +29,12 @@ const keymap = {
     'o': store => {
       const state = store.getState();
       const pane = otherPane(state.focusedPane);
-      gotoDirectory(store, state[pane].path);
+      store.dispatch(gotoDir(state[pane].path));
     },
     'O': store => {
       const state = store.getState();
       const pane = otherPane(state.focusedPane);
-      gotoDirectory(store, state[state.focusedPane].path, '', pane);
+      store.dispatch(gotoDir(state[state.focusedPane].path, '', pane));
     },
     'space': store => {
       store.dispatch({type: SELECT});
@@ -52,15 +52,15 @@ const keymap = {
       const items = getVisibleItemsOnFocusedPane(state);
       state = state[state.focusedPane];
       const item = items[state.cursor];
-      gotoDirectory(store, state.path, item.name);
+      store.dispatch(gotoDir(state.path, item.name));
     },
     '^': store => {
       let state = store.getState();
       state = state[state.focusedPane];
-      gotoDirectory(store, state.path, '..');
+      store.dispatch(gotoDir(state.path, '..'));
     },
     '~': store => {
-      gotoDirectory(store, '~');
+      store.dispatch(gotoDir('~'));
     },
     'tab': store => {
       store.dispatch({type: SWITCH_PANE});
