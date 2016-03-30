@@ -19,7 +19,7 @@ export const LeftFilePane = connect(state => {
     path: state.path,
     items: leftVisibleItems(state)
   };
-}, filePaneDispatcher)(views.FilePane);
+}, filePaneDispatcher, null, {withRef: true})(views.FilePane);
 
 export const LeftFilePaneFooter = connect(state => {
   state = state.left;
@@ -36,7 +36,7 @@ export const RightFilePane = connect(state => {
     path: state.path,
     items: rightVisibleItems(state)
   };
-}, filePaneDispatcher)(views.FilePane);
+}, filePaneDispatcher, null, {withRef: true})(views.FilePane);
 
 export const RightFilePaneFooter = connect(state => {
   state = state.right;

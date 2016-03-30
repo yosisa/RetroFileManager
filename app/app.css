@@ -65,7 +65,7 @@
   overflow-x: scroll;
 }
 
-.table-container .table:nth-child(even) {
+.table-container .table.even {
   background: #f2f2f2;
 }
 

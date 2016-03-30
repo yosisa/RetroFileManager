@@ -29,16 +29,86 @@ import { createSelector } from 'reselect';
 import { LeftFilePane, LeftFilePaneFooter, RightFilePane, RightFilePaneFooter, Prompt } from './containers';
 
 class App extends React.Component {
+  componentDidMount() {
+    let state = store.getState();
+    let pane = state.focusedPane;
+    let cursor = state[pane].cursor;
+    let selection = {
+      left: state.left.selection,
+      right: state.right.selection
+    };
+
+    const updateCursor = () => {
+      forEachElement('.cursor', row => {
+        removeClass(row, 'cursor');
+      });
+
+      var el = document.querySelector(`#${pane}-pane .table[data-index="${cursor}"]`);
+      if (el) {
+        addClass(el, 'cursor');
+      }
+    };
+
+    const updateSelection = pane => {
+      forEachElement(`#${pane}-pane .table`, row => {
+        if (selection[pane].hasOwnProperty(row.children[0].textContent)) {
+          addClass(row, 'selected');
+        } else {
+          removeClass(row, 'selected');
+        }
+      });
+    };
+
+    const leftPane = this.refs.leftPane.getWrappedInstance();
+    const rightPane = this.refs.rightPane.getWrappedInstance();
+    const lists = {
+      left: leftPane.refs.list,
+      right: rightPane.refs.list
+    };
+
+    const onScroll = (pane) => {
+      return () => {
+        if (pane === pane) {
+          updateCursor();
+          updateSelection(pane);
+        }
+      };
+    };
+
+    leftPane.refs.container.addEventListener('scroll', onScroll('left'));
+    rightPane.refs.container.addEventListener('scroll', onScroll('right'));
+
+    store.subscribe(() => {
+      // update variables
+      state = store.getState();
+      pane = state.focusedPane;
+      cursor = state[pane].cursor;
+      selection[pane] = state[pane].selection;
+
+      updateCursor();
+      updateSelection(pane);
+
+      // scroll
+      const list = lists[pane];
+      const [start, end] = list.getVisibleRange();
+      if (cursor >= end) {
+        list.scrollTo(cursor);
+      } else if (cursor <= start) {
+        list.scrollTo(Math.max(cursor - (end - start - 1)), 0);
+      }
+    });
+  }
+
   render() {
     return (
       <div>
         <div className="columns">
           <div id="left-pane" className="pane">
-            <LeftFilePane />
+            <LeftFilePane ref="leftPane" />
             <LeftFilePaneFooter />
           </div>
           <div id="right-pane" className="pane">
-            <RightFilePane />
+            <RightFilePane ref="rightPane" />
             <RightFilePaneFooter />
           </div>
         </div>
@@ -63,47 +133,6 @@ function render(store) {
   );
 }
 render(store);
-
-function cursorHandler(store) {
-  const fn = createSelector([
-    (state) => state.focusedPane,
-    (state) => state[state.focusedPane].cursor,
-    (state) => state[state.focusedPane].cursorGen,
-    (state) => state[state.focusedPane].items
-  ], (pane, cursor, gen, items) => {
-    forEachElement('.cursor', row => {
-      removeClass(row, 'cursor');
-    });
-    var el = document.querySelector(`#${pane}-pane .table-container .table:nth-child(${cursor+1})`);
-    if (el) {
-      addClass(el, 'cursor');
-      scrollToCursor();
-    }
-  });
-  return () => {
-    fn(store.getState());
-  };
-}
-store.subscribe(cursorHandler(store));
-
-function selectionHandler(store) {
-  const fn = createSelector([
-    (state) => state.focusedPane,
-    (state) => state[state.focusedPane].selection
-  ], (pane, selection) => {
-    forEachElement(`#${pane}-pane .table-container .table`, row => {
-      if (selection.hasOwnProperty(row.children[0].textContent)) {
-        addClass(row, 'selected');
-      } else {
-        removeClass(row, 'selected');
-      }
-    });
-  });
-  return () => {
-    fn(store.getState());
-  };
-}
-store.subscribe(selectionHandler(store));
 
 const ipc = require('electron').ipcRenderer;
 

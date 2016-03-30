@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import ReactList from 'react-list';
 import classnames from 'classnames';
 import moment from 'moment';
 import { humanBytes, modeToString } from './utils';
@@ -26,7 +27,11 @@ export class FilePane extends React.Component {
           <div className="table-cell col-mode">Mode</div>
         </div>
         <div ref="container" className="table-container">
-          {items.map(item => <FilePaneRow key={item.name} item={item} />)}
+          <ReactList ref="list"
+             itemRenderer={(i, key) => <FilePaneRow key={key} item={items[i]} index={i} />}
+            length={items.length}
+            type="uniform"
+            />
         </div>
       </div>
     );
@@ -35,17 +40,21 @@ export class FilePane extends React.Component {
 
 class FilePaneRow extends React.Component {
   render() {
-    const { item } = this.props;
+    const { item, index } = this.props;
     const size = parseInt(item.size, 10).toLocaleString('en');
     const mtime = moment.unix(item.mod_time).format('YYYY/MM/DD HH:mm:ss');
     const mode = modeToString(item.mode);
+    const tableClass = classnames({
+      table: true,
+      even: index % 2 === 1 // index start with 0
+    });
     const iconClass = classnames({
       'fa': true,
       'fa-folder': item.is_dir,
       'fa-file-o': !item.is_dir
     });
     return (
-      <div className="table">
+      <div className={tableClass} data-index={index}>
         <div className="table-cell col-name text-ellipsis">
           <i className={iconClass}></i>
           {item.name}
