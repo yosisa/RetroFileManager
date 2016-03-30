@@ -1,0 +1,144 @@
+* {
+  box-sizing: border-box;
+}
+
+.columns {
+  display: flex;
+}
+
+.column {
+  width: 100%;
+}
+
+#left-pane {
+  border-right: 1px solid #d0d0d0;
+}
+
+#right-pane {
+  border-left: 1px solid #d0d0d0;
+}
+
+.pane {
+  height: 100vh;
+  word-break: break-all;
+}
+
+.pane thead {
+  display: block;
+}
+
+.pane tbody {
+  display: block;
+  overflow-y: scroll;
+  height: calc(100vh - 41px);
+  width: 50vw;
+}
+
+.table {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.table-cell {
+  display: table-cell;
+  padding: 2px 4px;
+  overflow: hidden;
+  font-family: Ricty, Inconsolata, Consolas, 'Courier New', Courier, Monaco, monospace;
+}
+
+.table-header {
+  border-bottom: 1px solid #d0d0d0;
+}
+
+.table-header .table-cell {
+  border-right: 1px solid #d0d0d0;
+  background: #f2f2f2;
+  font-weight: normal;
+}
+
+.table-header .table-cell:last-child {
+  border-right: none;
+}
+
+.table-container {
+  overflow-x: scroll;
+}
+
+.table-container .table:nth-child(even) {
+  background: #f2f2f2;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.table-container .table.selected {
+  background: #C4EEF2;
+}
+
+.table-container .table.cursor {
+  background: #A0D8F1;
+}
+
+.table .fa {
+  margin-right: 4px;
+}
+
+.pane-header {
+  padding: 2px 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.pane-footer {
+  padding: 2px 4px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.pane-footer > div {
+  width: 50%;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  word-break: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#prompt {
+  position: absolute;
+  top: 50px;
+  background: ghostwhite;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px 4px gray;
+  font-size: 24px;
+  display: flex;
+}
+
+#prompt-title {
+  border-right: 1px solid #d0d0d0;
+  padding: 10px 20px;
+  color: crimson;
+  flex: 0 0 auto;
+}
+
+#prompt-input {
+  flex: 1 0 auto;
+  position: relative;
+}
+
+#prompt-input input {
+  padding: 10px 20px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 96%;
+  outline: 0;
+  border: none;
+  background: transparent;
+}
