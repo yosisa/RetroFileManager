@@ -14,7 +14,8 @@ const actions = [
   'OPEN_PROMPT',
   'CLOSE_PROMPT',
   'SET_VISIBLE_FILTER',
-  'MARK'
+  'MARK',
+  'SEARCH'
 ];
 
 for (let i = 0; i < actions.length; i++) {

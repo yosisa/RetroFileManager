@@ -15,7 +15,8 @@ import {
   OPEN_PROMPT,
   CLOSE_PROMPT,
   SET_VISIBLE_FILTER,
-  MARK
+  MARK,
+  SEARCH
 } from './actions';
 import { leftVisibleItems, rightVisibleItems, otherPane, smartCaseRegExp } from './utils';
 
@@ -100,6 +101,20 @@ function paneFactory(visibleItems) {
       return Object.assign({}, state, {
         filter: {pattern: action.pattern}
       });
+    case SEARCH:
+      try {
+        var re = smartCaseRegExp(action.pattern);
+      } catch(e) {
+        return state;
+      }
+      var items = visibleItems(state);
+      for (let i = 0; i < items.length; i++) {
+        let x = (i + state.cursor) % items.length;
+        if (items[x].name.match(re) !== null) {
+          return Object.assign({}, state, {cursor: x});
+        }
+      }
+      return state;
     default:
       return state;
     }
@@ -138,7 +153,8 @@ export default function appReducer(state, action) {
         show: true,
         title: action.title,
         input: action.input || '',
-        handler: action.handler
+        handler: action.handler,
+        onchange: Boolean(action.onchange)
       }
     });
   case CLOSE_PROMPT:

@@ -97,3 +97,18 @@ export function removeClass(el, name) {
 export function forEachElement(selector, fn) {
   Array.prototype.forEach.call(document.querySelectorAll(selector), fn);
 }
+
+export function throttle(fn, wait) {
+  let timer = null;
+  let args = null;
+  return function() {
+    args = arguments;
+    if (timer) {
+      return;
+    }
+    timer = setTimeout(() => {
+      timer = null;
+      fn.apply(this, args);
+    }, wait);
+  };
+}

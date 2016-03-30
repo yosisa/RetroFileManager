@@ -109,7 +109,11 @@ export class Prompt extends React.Component {
   }
 
   handleChange(ev) {
-    this.setState({input: ev.target.value});
+    const input = ev.target.value;
+    this.setState({input});
+    if (this.props.onchange) {
+      this.props.actionHandler(this.props.handler, input, true);
+    }
   }
 
   handleKeyDown(ev) {

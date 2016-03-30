@@ -1,6 +1,6 @@
 'use strict';
 
-import { getVisibleItemsOnFocusedPane, otherPane } from './utils';
+import { getVisibleItemsOnFocusedPane, otherPane, throttle } from './utils';
 import {
   MOVE_CURSOR_DOWN,
   MOVE_CURSOR_UP,
@@ -14,6 +14,7 @@ import {
   OPEN_PROMPT,
   CLOSE_PROMPT,
   SET_VISIBLE_FILTER,
+  SEARCH,
   gotoDirectory
 } from './actions';
 
@@ -80,6 +81,9 @@ const keymap = {
       const state = store.getState();
       const pattern = state[state.focusedPane].filter.pattern || '';
       store.dispatch({type: OPEN_PROMPT, title: 'Filter', input: pattern, handler: 'filter'});
+    },
+    '/': store => {
+      store.dispatch({type: OPEN_PROMPT, title: 'Search', handler: 'search', onchange: true});
     }
   },
   prompt: {
@@ -95,7 +99,10 @@ export const promptHandlers = {
   },
   'filter': (dispatch, input) => {
     dispatch({type: SET_VISIBLE_FILTER, pattern: input});
-  }
+  },
+  'search': throttle((dispatch, input) => {
+    dispatch({type: SEARCH, pattern: input});
+  }, 50)
 };
 
 export function init(store) {
