@@ -39,6 +39,7 @@ export const otherPane = (pane) => pane === 'left' ? 'right' : 'left';
 export function smartCaseRegExp(pattern) {
   const haveUpperCase = pattern !== pattern.toLowerCase();
   const flags = haveUpperCase ? '' : 'i';
+  pattern = pattern.replace(/\s+/g, '.*');
   return new RegExp(pattern, flags);
 }
 
