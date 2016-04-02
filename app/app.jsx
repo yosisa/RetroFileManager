@@ -52,7 +52,7 @@ class App extends React.Component {
 
     const updateSelection = pane => {
       forEachElement(`#${pane}-pane .table`, row => {
-        if (selection[pane].hasOwnProperty(row.children[0].textContent)) {
+        if (selection[pane].hasOwnProperty(row.dataset.fullName)) {
           addClass(row, 'selected');
         } else {
           removeClass(row, 'selected');

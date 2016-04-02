@@ -54,14 +54,15 @@ export const Prompt = connect(state => {
     title: state.prompt.title,
     input: state.prompt.input,
     handler: state.prompt.handler,
-    onchange: state.prompt.onchange
+    onchange: state.prompt.onchange,
+    params: state.prompt.params
   };
 }, dispatch => {
   return {
-    actionHandler: (action, input, keep) => {
+    actionHandler: (action, input, params, keep) => {
       const fn = promptHandlers[action];
       if (fn) {
-        if (fn(dispatch, input) || keep) {
+        if (fn(dispatch, input, params) || keep) {
           return;
         }
       }

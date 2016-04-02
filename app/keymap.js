@@ -15,7 +15,8 @@ import {
   CLOSE_PROMPT,
   SET_VISIBLE_FILTER,
   SEARCH,
-  gotoDir
+  gotoDir,
+  find
 } from './actions';
 
 const keymap = {
@@ -82,6 +83,11 @@ const keymap = {
       const pattern = state[state.focusedPane].filter.pattern || '';
       store.dispatch({type: OPEN_PROMPT, title: 'Filter', input: pattern, handler: 'filter'});
     },
+    'F': store => {
+      const state = store.getState();
+      const params = {path: state[state.focusedPane].path};
+      store.dispatch({type: OPEN_PROMPT, title: 'Find', handler: 'find', params});
+    },
     '/': store => {
       store.dispatch({type: OPEN_PROMPT, title: 'Search', handler: 'search', onchange: true});
     }
@@ -102,7 +108,10 @@ export const promptHandlers = {
   },
   'search': throttle((dispatch, input) => {
     dispatch({type: SEARCH, pattern: input});
-  }, 50)
+  }, 50),
+  'find': (dispatch, input, params) => {
+    dispatch(find(params.path, input));
+  }
 };
 
 export function init(store) {

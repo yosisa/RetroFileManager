@@ -41,6 +41,11 @@ export class FilePane extends React.Component {
 class FilePaneRow extends React.Component {
   render() {
     const { item, index } = this.props;
+    let name = item.name;
+    const level = (name.match(/\//g) || []).length;
+    if (level > 0) {
+      name = name.slice(name.lastIndexOf('/') + 1);
+    }
     const size = parseInt(item.size, 10).toLocaleString('en');
     const mtime = moment.unix(item.mod_time).format('YYYY/MM/DD HH:mm:ss');
     const mode = modeToString(item.mode);
@@ -54,10 +59,10 @@ class FilePaneRow extends React.Component {
       'fa-file-o': !item.is_dir
     });
     return (
-      <div className={tableClass} data-index={index}>
+      <div className={tableClass} data-index={index} data-full-name={item.name}>
         <div className="table-cell col-name text-ellipsis">
-          <i className={iconClass}></i>
-          {item.name}
+          <i className={iconClass} style={{marginLeft: `${level*10}px`}}></i>
+          {name}
         </div>
         <div className="table-cell col-timestamp text-ellipsis">{mtime}</div>
         <div className="table-cell col-size text-ellipsis text-right">{size}</div>
@@ -112,7 +117,7 @@ export class Prompt extends React.Component {
     const input = ev.target.value;
     this.setState({input});
     if (this.props.onchange) {
-      this.props.actionHandler(this.props.handler, input, true);
+      this.props.actionHandler(this.props.handler, input, this.props.params, true);
     }
   }
 
@@ -120,7 +125,7 @@ export class Prompt extends React.Component {
     if (ev.keyCode === 13) {
       ev.preventDefault();
       ev.stopPropagation();
-      this.props.actionHandler(this.props.handler, this.state.input);
+      this.props.actionHandler(this.props.handler, this.state.input, this.props.params);
     }
   }
 

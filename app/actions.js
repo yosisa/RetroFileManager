@@ -15,7 +15,8 @@ const actions = [
   'CLOSE_PROMPT',
   'SET_VISIBLE_FILTER',
   'MARK',
-  'SEARCH'
+  'SEARCH',
+  'FIND'
 ];
 
 for (let i = 0; i < actions.length; i++) {
@@ -25,11 +26,13 @@ for (let i = 0; i < actions.length; i++) {
 
 import { CALL_RPC } from './middleware/rpc';
 
+const server = '127.0.0.1:50051';
+
 export function gotoDir(dir, target, pane) {
   const action = {
     type: 'GOTO_DIR',
     [CALL_RPC]: {
-      server: '127.0.0.1:50051',
+      server,
       method: 'readDir',
       params: {
         base_dir: dir,
@@ -41,4 +44,18 @@ export function gotoDir(dir, target, pane) {
     action.pane = pane;
   }
   return action;
+}
+
+export function find(dir, name) {
+  return {
+    type: 'FIND',
+    [CALL_RPC]: {
+      server,
+      method: 'find',
+      params: {
+        base_dir: dir,
+        name
+      }
+    }
+  };
 }

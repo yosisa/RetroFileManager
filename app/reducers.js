@@ -16,7 +16,8 @@ import {
   CLOSE_PROMPT,
   SET_VISIBLE_FILTER,
   MARK,
-  SEARCH
+  SEARCH,
+  FIND
 } from './actions';
 import { leftVisibleItems, rightVisibleItems, otherPane, smartCaseRegExp } from './utils';
 
@@ -49,6 +50,13 @@ function paneFactory(visibleItems) {
         cursorHistory,
         selection: {},
         diskUsage: action.response.disk_usage
+      });
+    case FIND:
+      return Object.assign({}, state, {
+        path: action.response.path,
+        items: action.response.items,
+        cursor: 0,
+        selection: {}
       });
     case TOGGLE_DOTFILES:
       let showDotFiles = !state.showDotFiles;
@@ -158,7 +166,8 @@ export default function appReducer(state, action) {
         title: action.title,
         input: action.input || '',
         handler: action.handler,
-        onchange: Boolean(action.onchange)
+        onchange: Boolean(action.onchange),
+        params: action.params
       }
     });
   case CLOSE_PROMPT:
