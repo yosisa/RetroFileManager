@@ -26,14 +26,19 @@ function paneFactory(visibleItems) {
     state = state || {
       path: '',
       items: [],
-      showDotFiles: false,
-      filter: {},
+      filter: filter(undefined, action),
       cursor: 0,
       cursorHistory: {},
       cursorGen: 0,
       selection: {},
       diskUsage: {}
     };
+
+    switch (action.type) {
+    case TOGGLE_DOTFILES:
+    case SET_VISIBLE_FILTER:
+      return merge(state, {filter: filter(state.filter, action)});
+    }
 
     switch (action.type) {
     case GOTO_DIR:
@@ -57,11 +62,6 @@ function paneFactory(visibleItems) {
         items: action.response.items,
         cursor: 0,
         selection: {}
-      });
-    case TOGGLE_DOTFILES:
-      let showDotFiles = !state.showDotFiles;
-      return Object.assign({}, state, {
-        showDotFiles: showDotFiles
       });
     case REDRAW_CURSOR:
       return Object.assign({}, state, {
@@ -109,10 +109,6 @@ function paneFactory(visibleItems) {
       var selection = Object.assign({}, state.selection);
       toggleSelection(selection, visibleItems(state).filter(f => !f.is_dir));
       return Object.assign({}, state, {selection});
-    case SET_VISIBLE_FILTER:
-      return Object.assign({}, state, {
-        filter: {pattern: action.pattern}
-      });
     case SEARCH:
       try {
         var re = smartCaseRegExp(action.pattern);
@@ -131,6 +127,20 @@ function paneFactory(visibleItems) {
       return state;
     }
   };
+}
+
+function filter(state = {
+  showDotFiles: false,
+  pattern: ''
+}, action) {
+  switch (action.type) {
+  case TOGGLE_DOTFILES:
+    return merge(state, {showDotFiles: !state.showDotFiles});
+  case SET_VISIBLE_FILTER:
+    return merge(state, {pattern: action.pattern});
+  default:
+    return state;
+  }
 }
 
 function toggleSelection(selection, items) {
@@ -186,4 +196,8 @@ export default function appReducer(state, action) {
   default:
     return state;
   }
+}
+
+function merge(state, data) {
+  return Object.assign({}, state, data);
 }

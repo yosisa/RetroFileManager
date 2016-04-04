@@ -2,8 +2,8 @@
 
 import { createSelector } from 'reselect';
 
-function visibleItems(items, showDotFiles, filter) {
-  if (!showDotFiles) {
+function visibleItems(items, filter) {
+  if (!filter.showDotFiles) {
     items = items.filter(item => item.name[0] !== '.');
   }
   if (filter.pattern) {
@@ -15,13 +15,11 @@ function visibleItems(items, showDotFiles, filter) {
 
 export const leftVisibleItems = createSelector([
   (state) => state.items,
-  (state) => state.showDotFiles,
   (state) => state.filter
 ], visibleItems);
 
 export const rightVisibleItems = createSelector([
   (state) => state.items,
-  (state) => state.showDotFiles,
   (state) => state.filter
 ], visibleItems);
 
