@@ -15,10 +15,19 @@ export class FilePane extends React.Component {
   }
 
   render() {
-    const { path, items } = this.props;
+    const { path, items, ready } = this.props;
+    var icons = '';
+    if (ready === false) {
+      icons = <i className="fa fa-spinner fa-pulse"></i>;
+    }
     return (
       <div>
-        <div ref="paneHeader" className="pane-header">{path}</div>
+        <div ref="paneHeader" className="pane-header">
+          <div className="pane-header-path">{path}</div>
+          <div className="pane-header-status">
+            {icons}
+          </div>
+        </div>
         <div ref="header" className="table table-header">
           <div className="table-cell col-name">Name</div>
           <div className="table-cell col-timestamp">Timestamp</div>

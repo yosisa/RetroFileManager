@@ -20,11 +20,12 @@ export default store => next => action => {
     return newAction;
   }
 
+  next(actionWith({ready: false}));
   client[method](params, (error, response) => {
     if (error) {
-      next(actionWith({error}));
+      next(actionWith({ready: true, error}));
     } else {
-      next(actionWith({response}));
+      next(actionWith({ready: true, response}));
     }
   });
 }

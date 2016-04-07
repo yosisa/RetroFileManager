@@ -24,6 +24,7 @@ import { otherPane, smartCaseRegExp } from './utils';
 function pane(state, action) {
   state = state || {
     path: '',
+    ready: true,
     items: [],
     allItems: [],
     filter: filter(undefined, action),
@@ -45,6 +46,10 @@ function pane(state, action) {
     });
   }
 
+  if (action.ready === false) {
+    return merge(state, {ready: false});
+  }
+
   switch (action.type) {
   case GOTO_DIR:
     var { cursorHistory } = state;
@@ -55,6 +60,7 @@ function pane(state, action) {
     }
     return Object.assign({}, state, {
       path: action.response.path,
+      ready: true,
       items: visibleItems(action.response.items, state.filter),
       allItems: action.response.items,
       cursor: cursorHistory[action.response.path] || 0,
@@ -65,6 +71,7 @@ function pane(state, action) {
   case FIND:
     return Object.assign({}, state, {
       path: action.response.path,
+      ready: true,
       items: visibleItems(action.response.items, state.filter),
       allItems: action.response.items,
       cursor: 0,

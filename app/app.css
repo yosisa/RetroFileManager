@@ -88,6 +88,15 @@
 .pane-header {
   padding: 2px 4px;
   border-bottom: 1px solid #eee;
+  display: flex;
+}
+
+.pane-header-path {
+  flex: 1 0 auto;
+}
+
+.pane-header-status {
+  flex: 0 0 auto;
 }
 
 .pane-footer {
