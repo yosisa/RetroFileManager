@@ -1,37 +1,5 @@
 'use strict';
 
-import { createSelector } from 'reselect';
-
-function visibleItems(items, filter) {
-  if (!filter.showDotFiles) {
-    items = items.filter(item => item.name[0] !== '.');
-  }
-  if (filter.pattern) {
-    var re = smartCaseRegExp(filter.pattern);
-    items = items.filter(item => item.is_dir || item.name.match(re) !== null);
-  }
-  return items;
-}
-
-export const leftVisibleItems = createSelector([
-  (state) => state.items,
-  (state) => state.filter
-], visibleItems);
-
-export const rightVisibleItems = createSelector([
-  (state) => state.items,
-  (state) => state.filter
-], visibleItems);
-
-export const getVisibleItemsOnFocusedPane = (state) => {
-  switch (state.focusedPane) {
-  case 'left':
-    return leftVisibleItems(state.left);
-  case 'right':
-    return rightVisibleItems(state.right);
-  }
-};
-
 export const otherPane = (pane) => pane === 'left' ? 'right' : 'left';
 
 export function smartCaseRegExp(pattern) {

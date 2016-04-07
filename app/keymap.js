@@ -1,6 +1,6 @@
 'use strict';
 
-import { getVisibleItemsOnFocusedPane, otherPane, throttle } from './utils';
+import { otherPane, throttle } from './utils';
 import {
   MOVE_CURSOR_DOWN,
   MOVE_CURSOR_UP,
@@ -50,9 +50,8 @@ const keymap = {
     },
     'enter': store => {
       let state = store.getState();
-      const items = getVisibleItemsOnFocusedPane(state);
       state = state[state.focusedPane];
-      const item = items[state.cursor];
+      const item = state.items[state.cursor];
       store.dispatch(gotoDir(state.path, item.name));
     },
     '^': store => {

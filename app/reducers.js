@@ -19,114 +19,117 @@ import {
   SEARCH,
   FIND
 } from './actions';
-import { leftVisibleItems, rightVisibleItems, otherPane, smartCaseRegExp } from './utils';
+import { otherPane, smartCaseRegExp } from './utils';
 
-function paneFactory(visibleItems) {
-  return (state, action) => {
-    state = state || {
-      path: '',
-      items: [],
-      filter: filter(undefined, action),
-      cursor: 0,
-      cursorHistory: {},
-      cursorGen: 0,
-      selection: {},
-      diskUsage: {}
-    };
+function pane(state, action) {
+  state = state || {
+    path: '',
+    items: [],
+    allItems: [],
+    filter: filter(undefined, action),
+    cursor: 0,
+    cursorHistory: {},
+    cursorGen: 0,
+    selection: {},
+    diskUsage: {}
+  };
 
-    switch (action.type) {
-    case TOGGLE_DOTFILES:
-    case SET_VISIBLE_FILTER:
-      return merge(state, {filter: filter(state.filter, action)});
+  switch (action.type) {
+  case TOGGLE_DOTFILES:
+    return merge(state, {filter: filter(state.filter, action)});
+  case SET_VISIBLE_FILTER:
+    var newFilter = filter(state.filter, action);
+    return merge(state, {
+      items: visibleItems(state.allItems, newFilter),
+      filter: newFilter
+    });
+  }
+
+  switch (action.type) {
+  case GOTO_DIR:
+    var { cursorHistory } = state;
+    if (state.path) {
+      cursorHistory = Object.assign({}, cursorHistory, {
+        [state.path]: state.cursor
+      });
     }
-
-    switch (action.type) {
-    case GOTO_DIR:
-      var { cursorHistory } = state;
-      if (state.path) {
-        cursorHistory = Object.assign({}, cursorHistory, {
-          [state.path]: state.cursor
-        });
-      }
-      return Object.assign({}, state, {
-        path: action.response.path,
-        items: action.response.items,
-        cursor: cursorHistory[action.response.path] || 0,
-        cursorHistory,
-        selection: {},
-        diskUsage: action.response.disk_usage
-      });
-    case FIND:
-      return Object.assign({}, state, {
-        path: action.response.path,
-        items: action.response.items,
-        cursor: 0,
-        selection: {}
-      });
-    case REDRAW_CURSOR:
-      return Object.assign({}, state, {
-        cursorGen: state.cursorGen+1
-      });
-    case MOVE_CURSOR_DOWN:
-      var next = state.cursor + 1;
-      var items = visibleItems(state);
-      var cursor = next < items.length ? next : 0;
-      return Object.assign({}, state, {cursor});
-    case MOVE_CURSOR_UP:
-      var next = state.cursor - 1;
-      var items = visibleItems(state);
-      var cursor = next >= 0 ? next : items.length - 1;
-      return Object.assign({}, state, {cursor});
-    case SELECT:
-      var selection = Object.assign({}, state.selection);
-      const item = visibleItems(state)[state.cursor];
-      if (state.selection.hasOwnProperty(item.name)) {
-        delete selection[item.name];
-      } else {
+    return Object.assign({}, state, {
+      path: action.response.path,
+      items: visibleItems(action.response.items, state.filter),
+      allItems: action.response.items,
+      cursor: cursorHistory[action.response.path] || 0,
+      cursorHistory,
+      selection: {},
+      diskUsage: action.response.disk_usage
+    });
+  case FIND:
+    return Object.assign({}, state, {
+      path: action.response.path,
+      items: visibleItems(action.response.items, state.filter),
+      allItems: action.response.items,
+      cursor: 0,
+      selection: {}
+    });
+  case REDRAW_CURSOR:
+    return Object.assign({}, state, {
+      cursorGen: state.cursorGen+1
+    });
+  case MOVE_CURSOR_DOWN:
+    var next = state.cursor + 1;
+    var cursor = next < state.items.length ? next : 0;
+    return Object.assign({}, state, {cursor});
+  case MOVE_CURSOR_UP:
+    var next = state.cursor - 1;
+    var cursor = next >= 0 ? next : state.items.length - 1;
+    return Object.assign({}, state, {cursor});
+  case SELECT:
+    var selection = Object.assign({}, state.selection);
+    const item = state.items[state.cursor];
+    if (state.selection.hasOwnProperty(item.name)) {
+      delete selection[item.name];
+    } else {
+      selection[item.name] = item;
+    }
+    return Object.assign({}, state, {selection});
+  case MARK:
+    try {
+      var re = smartCaseRegExp(action.pattern);
+    } catch(e) {
+      return state;
+    }
+    var selection = Object.assign({}, state.selection);
+    state.items.forEach(item => {
+      if (item.name.match(re) !== null) {
         selection[item.name] = item;
       }
-      return Object.assign({}, state, {selection});
-    case MARK:
-      try {
-        var re = smartCaseRegExp(action.pattern);
-      } catch(e) {
-        return state;
-      }
-      var selection = Object.assign({}, state.selection);
-      visibleItems(state).forEach(item => {
-        if (item.name.match(re) !== null) {
-          selection[item.name] = item;
-        }
-      });
-      return Object.assign({}, state, {selection});
-    case CLEAR_SELECTION:
-      return Object.assign({}, state, {selection: {}});
-    case TOGGLE_SELECTION:
-      var selection = Object.assign({}, state.selection);
-      toggleSelection(selection, visibleItems(state));
-      return Object.assign({}, state, {selection});
-    case TOGGLE_FILE_SELECTION:
-      var selection = Object.assign({}, state.selection);
-      toggleSelection(selection, visibleItems(state).filter(f => !f.is_dir));
-      return Object.assign({}, state, {selection});
-    case SEARCH:
-      try {
-        var re = smartCaseRegExp(action.pattern);
-      } catch(e) {
-        return state;
-      }
-      var items = visibleItems(state);
-      for (let i = 0; i < items.length; i++) {
-        let x = (i + state.cursor) % items.length;
-        if (items[x].name.match(re) !== null) {
-          return Object.assign({}, state, {cursor: x});
-        }
-      }
-      return state;
-    default:
+    });
+    return Object.assign({}, state, {selection});
+  case CLEAR_SELECTION:
+    return Object.assign({}, state, {selection: {}});
+  case TOGGLE_SELECTION:
+    var selection = Object.assign({}, state.selection);
+    toggleSelection(selection, state.items);
+    return Object.assign({}, state, {selection});
+  case TOGGLE_FILE_SELECTION:
+    var selection = Object.assign({}, state.selection);
+    toggleSelection(selection, state.items.filter(f => !f.is_dir));
+    return Object.assign({}, state, {selection});
+  case SEARCH:
+    try {
+      var re = smartCaseRegExp(action.pattern);
+    } catch(e) {
       return state;
     }
-  };
+    for (let i = 0; i < state.items.length; i++) {
+      let x = (i + state.cursor) % state.items.length;
+      if (state.items[x].name.match(re) !== null) {
+        return Object.assign({}, state, {cursor: x});
+      }
+    }
+    return state;
+  default:
+    return state;
+  }
 }
 
 function filter(state = {
@@ -143,6 +146,20 @@ function filter(state = {
   }
 }
 
+function visibleItems(items, filter) {
+  var { showDotFiles, pattern } = filter;
+  if (pattern) {
+    pattern = smartCaseRegExp(pattern);
+  }
+  return items.filter(item => {
+    if (!showDotFiles && item.name[0] === '.' ||
+        pattern && !item.is_dir && item.name.match(pattern) === null) {
+      return false;
+    }
+    return true;
+  });
+}
+
 function toggleSelection(selection, items) {
   items.forEach(item => {
     if (selection.hasOwnProperty(item.name)) {
@@ -153,14 +170,11 @@ function toggleSelection(selection, items) {
   });
 }
 
-const leftPane = paneFactory(leftVisibleItems);
-const rightPane = paneFactory(rightVisibleItems);
-
 export default function appReducer(state, action) {
   state = state || {
     focusedPane: 'left',
-    left: leftPane(null, action),
-    right: rightPane(null, action),
+    left: pane(null, action),
+    right: pane(null, action),
     prompt: {
       show: false
     }
@@ -190,9 +204,9 @@ export default function appReducer(state, action) {
 
   switch (action.pane || state.focusedPane) {
   case 'left':
-    return Object.assign({}, state, {left: leftPane(state.left, action)});
+    return Object.assign({}, state, {left: pane(state.left, action)});
   case 'right':
-    return Object.assign({}, state, {right: rightPane(state.right, action)});
+    return Object.assign({}, state, {right: pane(state.right, action)});
   default:
     return state;
   }

@@ -1,7 +1,6 @@
 'use strict';
 
 import { connect } from 'react-redux';
-import { leftVisibleItems, rightVisibleItems } from './utils';
 import * as views from './views.jsx';
 import { CLOSE_PROMPT, REDRAW_CURSOR } from './actions';
 
@@ -17,7 +16,7 @@ export const LeftFilePane = connect(state => {
   state = state.left;
   return {
     path: state.path,
-    items: leftVisibleItems(state)
+    items: state.items
   };
 }, filePaneDispatcher, null, {withRef: true})(views.FilePane);
 
@@ -25,7 +24,7 @@ export const LeftFilePaneFooter = connect(state => {
   state = state.left;
   return {
     diskUsage: state.diskUsage,
-    items: leftVisibleItems(state).length,
+    items: state.items.length,
     selection: state.selection
   };
 })(views.FilePaneFooter);
@@ -34,7 +33,7 @@ export const RightFilePane = connect(state => {
   state = state.right;
   return {
     path: state.path,
-    items: rightVisibleItems(state)
+    items: state.items
   };
 }, filePaneDispatcher, null, {withRef: true})(views.FilePane);
 
@@ -42,7 +41,7 @@ export const RightFilePaneFooter = connect(state => {
   state = state.right;
   return {
     diskUsage: state.diskUsage,
-    items: rightVisibleItems(state).length,
+    items: state.items.length,
     selection: state.selection
   };
 })(views.FilePaneFooter);
