@@ -71,3 +71,9 @@ export const Prompt = connect(state => {
     }
   };
 })(views.Prompt);
+
+export const Notification = connect(state => {
+  return {
+    items: state.notifications
+  };
+})(views.Notification);

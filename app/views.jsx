@@ -2,6 +2,7 @@
 
 import React from 'react';
 import ReactList from 'react-list';
+import CSSTransitionGroup from 'react-addons-css-transition-group';
 import classnames from 'classnames';
 import moment from 'moment';
 import { humanBytes, modeToString } from './utils';
@@ -162,6 +163,26 @@ export class Prompt extends React.Component {
              onKeyDown={this.handleKeyDown.bind(this)}
              />
         </div>
+      </div>
+    );
+  }
+}
+
+export class Notification extends React.Component {
+  render() {
+    const { items } =  this.props;
+    return (
+      <div id="notification">
+        <CSSTransitionGroup transitionName="notify" transitionEnterTimeout={300} transitionLeaveTimeout={300}>
+          {items.map((item, i) => {
+            return (
+              <div key={i} className="toast" style={{zIndex: items.length - i}}>
+                <i className="fa fa-lg fa-warning"></i>
+                {item.message}
+              </div>
+            );
+          })}
+        </CSSTransitionGroup>
       </div>
     );
   }

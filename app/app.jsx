@@ -7,9 +7,11 @@ import './app.css';
 import { createStore, applyMiddleware } from 'redux';
 import rpc from './middleware/rpc';
 import appReducer from './reducers';
+import { dismissNotifications } from './subscribers';
 import { addClass, removeClass, forEachElement } from './utils';
 
 const store = createStore(appReducer, applyMiddleware(rpc));
+store.subscribe(dismissNotifications(store));
 
 function scrollToCursor() {
   const row = document.querySelector('.cursor');
@@ -27,7 +29,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider, connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { LeftFilePane, LeftFilePaneFooter, RightFilePane, RightFilePaneFooter, Prompt } from './containers';
+import { LeftFilePane, LeftFilePaneFooter, RightFilePane, RightFilePaneFooter, Prompt, Notification } from './containers';
 
 class App extends React.Component {
   componentDidMount() {
@@ -114,6 +116,7 @@ class App extends React.Component {
           </div>
         </div>
         {this.props.show ? <Prompt /> : ''}
+        <Notification />
       </div>
     );
   }

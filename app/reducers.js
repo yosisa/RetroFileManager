@@ -17,7 +17,9 @@ import {
   SET_VISIBLE_FILTER,
   MARK,
   SEARCH,
-  FIND
+  FIND,
+  SHOW_NOTIFICATION,
+  DISMISS_NOTIFICATION
 } from './actions';
 import { otherPane, smartCaseRegExp } from './utils';
 
@@ -177,6 +179,8 @@ function toggleSelection(selection, items) {
   });
 }
 
+var notificationID = 1;
+
 export default function appReducer(state, action) {
   state = state || {
     focusedPane: 'left',
@@ -184,7 +188,8 @@ export default function appReducer(state, action) {
     right: pane(null, action),
     prompt: {
       show: false
-    }
+    },
+    notifications: []
   };
 
   switch (action.type) {
@@ -206,6 +211,32 @@ export default function appReducer(state, action) {
       prompt: {
         show: false
       }
+    });
+  case SHOW_NOTIFICATION:
+    var notification = {
+      id: notificationID++,
+      message: action.message
+    };
+    if (action.dismissAfter) {
+      notification.dismissAfter = action.dismissAfter;
+    }
+    return merge(state, {
+      notifications: [...state.notifications, notification]
+    });
+  case DISMISS_NOTIFICATION:
+    return merge(state, {
+      notifications: state.notifications.filter(x => x.id !== action.id)
+    });
+  }
+
+  if (action.error) {
+    return merge(state, {
+      [state.focusedPane]: merge(state[state.focusedPane], {ready: true}),
+      notifications: [...state.notifications, {
+        id: notificationID++,
+        message: String(action.error),
+        dismissAfter: 5000
+      }]
     });
   }
 

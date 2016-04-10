@@ -151,3 +151,47 @@
   border: none;
   background: transparent;
 }
+
+#notification {
+  position: absolute;
+  right: 10px;
+  bottom: 30px;
+  width: 400px;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.toast {
+  padding: 10px 16px;
+  background: whitesmoke;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px 2px gray;
+  font-size: 110%;
+  margin-top: 10px;
+}
+
+.toast .fa {
+  margin-right: 4px;
+}
+
+.toast .fa-warning {
+  color: crimson;
+}
+
+.notify-enter {
+  opacity: 0.01;
+}
+
+.notify-enter.notify-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.notify-leave {
+  opacity: 1;
+}
+
+.notify-leave.notify-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}

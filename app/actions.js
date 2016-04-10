@@ -16,7 +16,9 @@ const actions = [
   'SET_VISIBLE_FILTER',
   'MARK',
   'SEARCH',
-  'FIND'
+  'FIND',
+  'SHOW_NOTIFICATION',
+  'DISMISS_NOTIFICATION'
 ];
 
 for (let i = 0; i < actions.length; i++) {
@@ -57,5 +59,23 @@ export function find(dir, name) {
         name
       }
     }
+  };
+}
+
+export function showNotification(message, dismissAfter) {
+  const action = {
+    type: 'SHOW_NOTIFICATION',
+    message
+  };
+  if (dismissAfter) {
+    action.dismissAfter = dismissAfter;
+  }
+  return action;
+}
+
+export function dismissNotification(id) {
+  return {
+    type: 'DISMISS_NOTIFICATION',
+    id
   };
 }
